@@ -1,0 +1,35 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+    border: 2px solid;   
+}
+
+.weather-block {
+    
+    border: solid;
+    border-color: black;
+    border-radius: 18px;
+
+    padding: 20px;
+    width: 350px;
+    height: 400px;
+
+}
+
+.city-input {
+    display: flex;
+    justify-content: space-between;
+}
+
+.weather-info {
+    border: solid;
+    border-color: aquamarine;
+
+    height: 150px;
+
+    margin-top: 20px;
+    padding: 10px;
+}
