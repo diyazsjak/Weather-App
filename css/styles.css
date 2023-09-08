@@ -1,13 +1,16 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-
-    border: 2px solid;   
 }
 
-.weather-block {
+#weather-block {
     
     border: solid;
     border-color: black;
@@ -19,17 +22,21 @@ body {
 
 }
 
-.city-input {
+#city-selector {
     display: flex;
     justify-content: space-between;
 }
 
-.weather-info {
+#weather-info {
     border: solid;
-    border-color: aquamarine;
+    border-color: black;
 
-    height: 150px;
+    height: 320px;
 
     margin-top: 20px;
     padding: 10px;
+}
+
+#error {
+    margin-top: 40px;
 }
