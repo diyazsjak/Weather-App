@@ -11,32 +11,25 @@ body {
 }
 
 #weather-block {
-    
     border: solid;
     border-color: black;
     border-radius: 18px;
-
+    
     padding: 20px;
-    width: 350px;
-    height: 400px;
-
+    width: 400px;
+    height: 500px;
 }
 
-#city-selector {
-    display: flex;
-    justify-content: space-between;
+#btn {
+    width: 50px;
 }
 
 #weather-info {
-    border: solid;
-    border-color: black;
-
-    height: 320px;
-
+    height: 350px;
     margin-top: 20px;
     padding: 10px;
 }
 
 #error {
-    margin-top: 40px;
+    margin-top: 20px;
 }

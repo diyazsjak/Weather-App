@@ -1,6 +1,6 @@
 const API_KEY = "d5a75bd487d14f13c64eabbf664cb5ad";
 
-const btn = document.getElementById("find-city-btn");
+const btn = document.getElementById("btn");
 const city_input = document.getElementById("city-input");
 const error = document.getElementById("error");
 
@@ -17,9 +17,9 @@ async function getCityList() {
         const city_list_html = document.getElementById("city-list").children;
 
         for (let i = 0; i < city_list_html.length; i++) {
-            let option = `${city_list_json[i]["name"]}, ${city_list_json[i]["country"]}`;
-            if (city_input.value == option) break;
-            city_list_html[i].value = option;
+            let option_city = `${city_list_json[i]["name"]}, ${city_list_json[i]["country"]}`;
+            if (city_input.value == option_city) break;
+            city_list_html[i].value = option_city;
         }
     }
 }
@@ -30,7 +30,7 @@ async function getWeather(city_name) {
         Request and display weather information for city_name
     */
     const weather_info = document.getElementById("weather-info").children;
-
+    
     // delete previously displayed weather information 
     for (let i = 0; i < weather_info.length; i++) {
         weather_info[i].innerHTML = "";
