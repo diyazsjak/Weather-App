@@ -1,79 +1,112 @@
 const API_KEY = "d5a75bd487d14f13c64eabbf664cb5ad";
 
 const btn = document.getElementById("find-city-btn");
-const city_input = document.getElementById("city-input");
+const cityInput = document.getElementById("city-input");
 const error = document.getElementById("error");
+let citySearchResults = document.getElementById("search-results");
 
 
-async function getCityList() {
+async function getCityList() 
+{
     /* 
-        Request list of cities and display them as options for input
-        when there's a change to the input form
-    */
-    const response = await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${city_input.value}&limit=5&appid=${API_KEY}`);
+     * Request list of cities and display them as options 
+     * for an input when there's a change to the input form
+     */
+    const response = await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${cityInput.value}&limit=5&appid=${API_KEY}`);
+
+    citySearchResults.style.visibility = "visible";
+    citySearchResults.innerHTML = "";
 
     if (response.ok) {
-        const city_list_json = await response.json();
-        const city_list_html = document.getElementById("city-list").children;
+        const cityListJson = await response.json();
 
-        for (let i = 0; i < city_list_html.length; i++) {
-            let option = `${city_list_json[i]["name"]}, ${city_list_json[i]["country"]}`;
-            if (city_input.value == option) break;
-            city_list_html[i].value = option;
+        for (let i = 0; i < cityListJson.length; i++) {
+            let option = `${cityListJson[i]["name"]}, ${cityListJson[i]["country"]}`;
+            let li = document.createElement("li");
+            li.textContent = option;
+            li.addEventListener("click", () => {
+                cityInput.value = option;
+                citySearchResults.innerHTML = "";
+            });
+            citySearchResults.appendChild(li);
         }
     }
 }
 
 
-async function getWeather(city_name) {
+async function getWeather() 
+{
     /*
-        Request and display weather information for city_name
-    */
-    const weather_info = document.getElementById("weather-info").children;
+     * Request and display weather information
+     */
+    const weatherInfo = document.getElementById("weather-info").children;
+    let weatherImg = document.getElementById("weather-img");
 
-    // delete previously displayed weather information 
-    for (let i = 0; i < weather_info.length; i++) {
-        weather_info[i].innerHTML = "";
-    }
-    // delete error message if it was previously displayed
+    // delete previously displayed information
     error.innerHTML = "";
+    weatherImg.style.display = "none";  // in case of clearing all information
+    for (let i = 0; i < weatherInfo.length; i++) {
+        weatherInfo[i].innerHTML = "";
+    }
 
-    let tmp = city_name.split(", ");
-    city_name = tmp[0];
+    // return nothing if input is clear
+    let cityInfo = cityInput.value.trim();  // remove whitespaces
+    if (cityInfo == "") return;
 
     // check if user wrote country code to include it into request
-    const response = (tmp.length == 2)
-        ? await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city_name},${tmp[1]}&appid=${API_KEY}&units=metric`)
-        : await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city_name}&appid=${API_KEY}&units=metric`);
+    cityInfo = cityInfo.split(", ");
+    const response = (cityInfo.length == 2)
+        ? await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityInfo[0]},${cityInfo[1]}&appid=${API_KEY}&units=metric`)
+        : await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityInfo[0]}&appid=${API_KEY}&units=metric`);
     
     if (response.ok) {
-        const weather_json = await response.json();
+        const weatherJson = await response.json();
 
-        let weather = weather_json["weather"][0]["main"];
-        let temp = weather_json["main"]["temp"];
-        let feels_like = weather_json["main"]["feels_like"]; 
-        let humidity = weather_json["main"]["humidity"]; 
-        let wind_speed = weather_json["wind"]["speed"];
-        let clouds = weather_json["clouds"]["all"];
+        let weather = weatherJson["weather"][0]["main"];
+        let imgCode = weatherJson["weather"][0]["icon"];
+        let temp = weatherJson["main"]["temp"];
+        let feelsLike = weatherJson["main"]["feelsLike"]; 
+        let humidity = weatherJson["main"]["humidity"]; 
+        let windSpeed = weatherJson["wind"]["speed"];
+        let clouds = weatherJson["clouds"]["all"];
 
         let rain;  // rain field may not be present
-        if (!(rain = weather_json["rain"])) rain = "Rain: Isn't raining"; 
-        else rain = `Rain: ${weather_json["rain"]["1h"]} mm`;
+        if (!(rain = weatherJson["rain"])) rain = "Rain: Isn't raining"; 
+        else rain = `Rain: ${weatherJson["rain"]["1h"]} mm`;
 
         // displaying information
-        document.getElementById("weather").innerHTML = `Weather in ${weather_json["name"]}, ${weather_json["sys"]["country"]}: ${weather}`;
-        document.getElementById("temp").innerHTML = `Temperature: ${temp} °`;
-        document.getElementById("feels-like").innerHTML = `Feels like: ${feels_like} °`;
-        document.getElementById("humidity").innerHTML = `Humidity: ${humidity} %`;
-        document.getElementById("wind-speed").innerHTML = `Wind speed: ${wind_speed} m/s`;
-        document.getElementById("rain").innerHTML = rain;
-        document.getElementById("clouds").innerHTML = `Clouds: ${clouds} %`;
+        document.getElementById("weather").textContent = `Weather in ${weatherJson["name"]}, ${weatherJson["sys"]["country"]}: ${weather}`;
+        document.getElementById("temp").textContent = `Temperature: ${temp} °`;
+        document.getElementById("feels-like").textContent = `Feels like: ${feelsLike} °`;
+        document.getElementById("humidity").textContent = `Humidity: ${humidity} %`;
+        document.getElementById("wind-speed").textContent = `Wind speed: ${windSpeed} m/s`;
+        document.getElementById("rain").textContent = rain;
+        document.getElementById("clouds").textContent = `Clouds: ${clouds} %`;
+        
+        weatherImg.style.display = "initial";
+        weatherImg.src = `https://openweathermap.org/img/wn/${imgCode}@2x.png`;
     }
     else {
         error.innerHTML = `Error fetching: ${response.status}`;
     }
 }
 
+let searchResultVisibility = function (event) {
+    /*
+     * show and hide search result list 
+     * depending on cursor's position when clicked
+     */
+    let cursorIsOnCitySearchResults = citySearchResults.contains(event.target);
+    let corsorIsOnCityInput = (cityInput.contains(event.target));
+    if (!cursorIsOnCitySearchResults && !corsorIsOnCityInput) {
+        citySearchResults.style.visibility = "hidden";
+    }
+    else if (corsorIsOnCityInput) {
+        citySearchResults.style.visibility = "visible";
+    }
+}
 
-city_input.addEventListener("input", getCityList);  // calls when there's a change to the input
-btn.addEventListener("click", ()=>{getWeather(city_input.value)});
+
+document.addEventListener("click", searchResultVisibility);
+cityInput.addEventListener("input", getCityList);  // calls when there's a change to the input
+btn.addEventListener("click", ()=>{getWeather()});

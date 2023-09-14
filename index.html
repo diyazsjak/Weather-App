@@ -10,18 +10,13 @@
 <body>
     <div id="weather-block">
         <div class="input-group mb-3">
-            <input type="text" id="city-input" class="form-control" placeholder="Input a city" list="city-list">
-            <datalist id="city-list">
-                <option value="">
-                <option value="">
-                <option value="">
-                <option value="">
-                <option value="">
-            </datalist>
+            <input type="text" id="city-input" class="form-control" placeholder="Input a city">
+            <ul id="search-results"></ul>
             <button id="find-city-btn" class="btn btn-outline-secondary">Search</button>
         </div>
         <div id="weather-info">
             <p id="weather"></p>
+            <img id="weather-img">
             <p id="temp"></p>
             <p id="feels-like"></p>
             <p id="humidity"></p>
