@@ -6,46 +6,39 @@ const error = document.getElementById("error");
 let citySearchResults = document.getElementById("search-results");
 
 
-// Need a fix: when typed fast, for some reason it doesn't
-// clear the options, so there're 2,3x options
 async function displayCityList() {
     /**
      * Request list of cities when there's a change 
      * to the input form and display them as options 
      */
-    citySearchResults.innerHTML = "";
-
-    // check if it was the last remaining letter deleted
     if (cityInput.value == "") {
+        citySearchResults.innerHTML = "";
         citySearchResults.style.visibility = "hidden";
-        return;  
+        return;
     }
 
     const response = await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${cityInput.value}&limit=3&appid=${API_KEY}`);
 
     if (response.ok) {
-        // need to add check for a case when there're same locations 
+        citySearchResults.innerHTML = "";
         const cityListJson = await response.json();
-        console.log(response);
 
         for (let i = 0; i < cityListJson.length; i++) {
-            let state = cityListJson[i]["state"];
+            let city = cityListJson[i];
+
+            let state = city["state"];
             let option = (state === undefined)  // state field could be not present
-                ? `${cityListJson[i]["name"]}, ${cityListJson[i]["country"]}`
-                : `${cityListJson[i]["name"]}, ${state}, ${cityListJson[i]["country"]}`;
+                ? `${city["name"]}, ${city["country"]}`
+                : `${city["name"]}, ${state}, ${city["country"]}`;
             
             let li = document.createElement("li");
             li.textContent = option;
             li.addEventListener("click", () => {
-                cityInput.value = option;
-                getWeather(null, [cityListJson[i]["lat"], cityListJson[i]["lon"]]);
+                getWeather(null, [city["lat"], city["lon"]]);  // null is cus getWeather can be called from eventListenner
             });
             citySearchResults.appendChild(li);
             citySearchResults.style.visibility = "visible";
         }
-    }
-    if (citySearchResults.innerHTML == "") {
-        citySearchResults.style.visibility = "hidden";
     }
 }
 
@@ -57,6 +50,7 @@ async function getWeather(e, coordinates = null) {
     /** 
      * Request weather information
      */
+    const urlEnd = `&appid=${API_KEY}&units=metric`;
     citySearchResults.innerHTML = "";
     error.innerHTML = "";
 
@@ -70,7 +64,6 @@ async function getWeather(e, coordinates = null) {
             // if input value wasn't selected from options(didn't get coordinates), get 
             // information by city name(check if state and country code were inputted)
             const urlWeatherByCity = `https://api.openweathermap.org/data/2.5/weather?q=${cityInfo[0]}`;
-            const urlEnd = `&appid=${API_KEY}&units=metric`;
 
             switch (cityInfo.length) {
                 case 1:
@@ -85,10 +78,9 @@ async function getWeather(e, coordinates = null) {
             let lat = coordinates[0];
             let lon = coordinates[1];
             coordinates = null;
-            return `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
+            return `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}` + urlEnd;
         }
     })();
-    console.log(url);
 
     const response = await fetch(url);
 
@@ -98,7 +90,6 @@ async function getWeather(e, coordinates = null) {
     }
     else {
         error.innerHTML = `Error fetching: ${response.status}, ${response.statusText}`;
-        console.log(response);
     }
 }
 
@@ -111,38 +102,24 @@ function displayWeather(json) {
     const mainInfo = document.querySelector(".main-info").children;
     const secInfo = document.querySelector(".secondary-info").children;
 
+    weatherInfo[0].textContent = `${json.name}, ${json.sys.country}`;
 
-    let weather = json["weather"][0]["main"];
-    let imgCode = json["weather"][0]["icon"];
-    let temp = json["main"]["temp"];
-    let feelsLike = json["main"]["feels_like"]; 
-    let humidity = json["main"]["humidity"]; 
-    let windSpeed = json["wind"]["speed"];
-    let clouds = json["clouds"]["all"];
+    mainInfo[0].children[0].textContent = `${json.main.temp.toFixed()}°`;
+    mainInfo[0].children[2].textContent = `${json.weather[0].main}`;
+    mainInfo[0].children[4].textContent = `Feels like ${json.main.feels_like.toFixed()}°`;
+    
+    mainInfo[1].src = `https://openweathermap.org/img/wn/${json.weather[0].icon}@2x.png`;
 
-    // rain field may not be present
-    let rain = json.rain;  
-    if (rain == undefined) rain = "-";
-    else rain = json.rain["1h"];
+    secInfo[0].children[0].textContent = `${json.main.humidity}%`;
+    secInfo[1].children[0].textContent = json.wind.speed;
+    secInfo[2].children[0].textContent = (json.rain != undefined) ? json.rain["1h"] : "-";
+    secInfo[3].children[0].textContent = `${json.clouds.all}%`;
 
-    // displaying information
-
-    weatherInfo[0].textContent = `${json["name"]}, ${json["sys"]["country"]}`;
-    mainInfo[0].children[0].textContent = `${temp.toFixed()}°`;
-    mainInfo[0].children[2].textContent = `${weather}`;
-    mainInfo[0].children[4].textContent = `Feels like ${feelsLike.toFixed()}°`;
-
-    secInfo[0].children[0].textContent = `${humidity}%`;
     secInfo[0].children[2].textContent = "Humidity";
-    secInfo[1].children[0].textContent = `${windSpeed}`;
-    secInfo[1].children[1].textContent = "m/s";
-    secInfo[1].children[3].textContent = "Wind";
-    secInfo[2].children[0].textContent = rain;
-    secInfo[2].children[2].textContent = "Rain";
-    secInfo[3].children[0].textContent = `${clouds}%`;
+    secInfo[1].children[2].textContent = "Wind(m/s)";
+    secInfo[2].children[2].textContent = "Rain(mm)";
     secInfo[3].children[2].textContent = "Clouds";
     
-    document.getElementById("weather-img").src = `https://openweathermap.org/img/wn/${imgCode}@2x.png`;
     document.querySelector(".secondary-info").style.visibility = "visible";
 }
 

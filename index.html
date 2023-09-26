@@ -7,30 +7,29 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="content">
-        <div class="input-form">
-            <input id="city-input" type="text" placeholder="Input a city">
+    <main>
+        <form>
+            <input id="city-input" type="text" autocomplete="off" placeholder="Input a city">
             <ul id="search-results"></ul>
-            <button id="find-city-btn"><img src="images/search_3031293.png"></button>
-        </div>
-        <div class="weather-info">
+            <button type="button" id="find-city-btn"><img src="images/search_3031293.png"></button>
+        </form>
+        <section class="weather-info">
             <h3 id="location"></h3>
-            <div class="main-info">
+            <section class="main-info">
                 <div class="temp-weather">
                     <span id="temp"></span><br>
                     <span></span><br>                           <!-- Weather -->
                     <span class="sec-info-text"></span>
                 </div>
                 <img id="weather-img">
-            </div>
-            <div class="secondary-info">
+            </section>
+            <section class="secondary-info">
                 <span id="humidity">
                     <span class="sec-info-value"></span><br>
                     <span class="sec-info-text"></span>         <!-- Humdity -->
                 </span>
                 <span id="wind">
-                    <span class="sec-info-value"></span>
-                    <span class="sec-info-text"></span><br>     <!-- m/s -->
+                    <span class="sec-info-value"></span><br>
                     <span class="sec-info-text"></span>         <!-- Wind -->
                 </span>
                 <span id="rain">
@@ -41,10 +40,10 @@
                     <span class="sec-info-value"></span><br>
                     <span class="sec-info-text"></span>         <!-- Clouds -->
                 </span>
-            </div>
-        </div>
+            </section>
+        </section>
         <p id="error"></p>
-    </div>
+    </main>
     <script src="src/index.js"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@ body {
     height: 100vh;
 }
 
-.content {
+main {
 	background: #EADBC8; 
     border-radius: 16px;
     box-shadow: 0 0 8px 5px #DAC0A3;
@@ -25,11 +25,11 @@ body {
     height: 500px;
 }
 
-.content:hover {
+main:hover {
     box-shadow: 0 0 6px 7px #DAC0A3;
 }
 
-.input-form {
+form {
     display: flex;
     height: 40px;
     position: relative;
